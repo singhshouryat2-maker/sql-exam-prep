@@ -1,0 +1,447 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>body{margin:0}[hidden]{display:none!important}img{max-width:100%}</style>
+<title>MakeMyTrip SQL Exam Prep</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
+<style>
+/* Layout: one reading column; a sticky section bar; query rows that expand; quiz cards below */
+:root {
+  --bg: #f6f8fb;
+  --surface: #ffffff;
+  --fg: #172033;
+  --muted: #5a6680;
+  --line: #dde3ee;
+  --accent: #2f5f98;      /* PostgreSQL-ish slate blue */
+  --accent-soft: #e6eef8;
+  --good: #1d7a4f;
+  --good-soft: #e3f3ea;
+  --bad: #b3372e;
+  --bad-soft: #fbe9e7;
+  --warn: #8a5a00;
+  --warn-soft: #fbf0d9;
+  --code-bg: #eef2f8;
+  --sans: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0f1420; --surface: #171e2d; --fg: #e4e9f2; --muted: #9aa6bd; --line: #2a3448;
+    --accent: #8db4e8; --accent-soft: #1d2b42; --good: #6fd3a0; --good-soft: #15301f;
+    --bad: #f08a80; --bad-soft: #3a1c1a; --warn: #e8bd63; --warn-soft: #33290f; --code-bg: #1f2738;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0f1420; --surface: #171e2d; --fg: #e4e9f2; --muted: #9aa6bd; --line: #2a3448;
+  --accent: #8db4e8; --accent-soft: #1d2b42; --good: #6fd3a0; --good-soft: #15301f;
+  --bad: #f08a80; --bad-soft: #3a1c1a; --warn: #e8bd63; --warn-soft: #33290f; --code-bg: #1f2738;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--fg); font-family: var(--sans); font-size: 15px; line-height: 1.55; }
+.wrap { max-width: 920px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 28px 64px; }
+h1, h2, h3 { text-wrap: balance; line-height: 1.2; margin: 0; }
+h1 { font-size: 1.9rem; font-weight: 700; letter-spacing: -0.01em; }
+h2 { font-size: 1.35rem; font-weight: 700; }
+h3 { font-size: 1rem; font-weight: 600; }
+p { margin: 0; max-width: 68ch; }
+code, .mono { font-family: var(--mono); font-size: 0.88em; }
+code { background: var(--code-bg); padding: 1px 5px; border-radius: 4px; }
+pre { font-family: var(--mono); font-size: 0.85rem; background: var(--code-bg); padding: 12px 14px; border-radius: 6px; overflow-x: auto; margin: 0; line-height: 1.5; }
+.muted { color: var(--muted); }
+.label { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); font-weight: 600; }
+a { color: var(--accent); }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+header.top { display: grid; gap: 14px; }
+.facts { display: flex; flex-wrap: wrap; gap: 8px 22px; padding: 12px 0; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+.facts div { display: grid; gap: 2px; }
+.facts b { font-weight: 600; font-variant-numeric: tabular-nums; }
+
+nav.jump { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: var(--bg); display: flex; gap: 6px; flex-wrap: wrap; padding-block: 10px; margin-top: 18px; border-bottom: 1px solid var(--line); }
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--bg); }
+nav.jump a { text-decoration: none; font-weight: 600; font-size: 0.88rem; padding: 6px 12px; border-radius: 999px; color: var(--fg); background: var(--surface); border: 1px solid var(--line); }
+nav.jump a:hover { border-color: var(--accent); color: var(--accent); }
+
+section { display: grid; gap: 16px; padding-top: 34px; scroll-margin-top: 60px; }
+.intro { display: grid; gap: 6px; }
+
+.concepts { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 12px; }
+.concept { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 14px 16px; display: grid; gap: 8px; align-content: start; min-width: 0; }
+.concept p { font-size: 0.92rem; }
+
+.explain { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 14px 16px; display: grid; gap: 10px; }
+.explain table { border-collapse: collapse; width: 100%; font-size: 0.9rem; }
+.explain td { padding: 6px 8px; border-top: 1px solid var(--line); vertical-align: top; }
+.explain td:first-child { font-family: var(--mono); font-size: 0.84rem; white-space: nowrap; color: var(--accent); }
+.tablebox { overflow-x: auto; }
+
+.filters { display: flex; gap: 6px; flex-wrap: wrap; }
+.filters button { font: inherit; font-size: 0.85rem; font-weight: 600; padding: 5px 12px; border-radius: 999px; border: 1px solid var(--line); background: var(--surface); color: var(--fg); cursor: pointer; }
+.filters button[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: var(--bg); }
+
+.qlist { display: grid; gap: 6px; }
+.q { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; }
+.q summary { list-style: none; cursor: pointer; display: grid; grid-template-columns: 3.2rem 1fr auto; gap: 10px; align-items: center; padding: 10px 14px; }
+.q summary::-webkit-details-marker { display: none; }
+.q .id { font-family: var(--mono); font-weight: 600; color: var(--accent); }
+.q .ttl { min-width: 0; }
+.q .ttl small { display: block; color: var(--muted); font-size: 0.8rem; }
+.q .times { font-family: var(--mono); font-size: 0.8rem; text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.q .times .after { color: var(--good); font-weight: 600; }
+.q[open] summary { border-bottom: 1px solid var(--line); }
+.q .body { padding: 12px 14px 14px; display: grid; gap: 10px; }
+.q .row { display: grid; grid-template-columns: 7.5rem 1fr; gap: 10px; font-size: 0.92rem; }
+.q .row > :last-child { min-width: 0; }
+.chip { display: inline-block; font-size: 0.7rem; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; padding: 1px 7px; border-radius: 4px; margin-left: 6px; vertical-align: 2px; }
+.chip.rewrite { background: var(--warn-soft); color: var(--warn); }
+.chip.index { background: var(--accent-soft); color: var(--accent); }
+.chip.none { background: var(--code-bg); color: var(--muted); }
+
+.score { font-weight: 600; font-variant-numeric: tabular-nums; }
+.mcq { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 14px 16px; display: grid; gap: 10px; }
+.mcq .n { font-family: var(--mono); color: var(--muted); font-size: 0.8rem; }
+.opts { display: grid; gap: 6px; }
+.opts button { font: inherit; text-align: left; padding: 8px 12px; border-radius: 6px; border: 1px solid var(--line); background: var(--bg); color: var(--fg); cursor: pointer; }
+.opts button:hover:not(:disabled) { border-color: var(--accent); }
+.opts button:disabled { cursor: default; }
+.opts button.right { background: var(--good-soft); border-color: var(--good); color: var(--fg); }
+.opts button.wrong { background: var(--bad-soft); border-color: var(--bad); color: var(--fg); }
+.why { font-size: 0.92rem; padding: 10px 12px; border-left: 3px solid var(--good); background: var(--good-soft); border-radius: 0 6px 6px 0; }
+
+.scen { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 14px 16px; display: grid; gap: 10px; }
+.scen details summary { cursor: pointer; font-weight: 600; color: var(--accent); }
+.scen details[open] summary { margin-bottom: 10px; }
+.scen .ans { display: grid; gap: 10px; }
+
+.tips { display: grid; gap: 8px; padding-left: 1.1rem; margin: 0; }
+.tips li { max-width: 70ch; }
+
+@media (max-width: 560px) {
+  h1 { font-size: 1.5rem; }
+  .q summary { grid-template-columns: 2.8rem 1fr; }
+  .q .times { grid-column: 2; text-align: left; }
+  .q .row { grid-template-columns: 1fr; gap: 2px; }
+}
+@media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto !important; } }
+html { scroll-behavior: smooth; }
+</style>
+</head>
+<body>
+<div class="wrap">
+<header class="top">
+  <span class="label">DE exam · Team T0131 · MakeMyTrip Travel Booking Database</span>
+  <h1>MakeMyTrip SQL Exam Prep</h1>
+  <p class="muted">Everything comes from our own project: the 30 queries, the indexes in <code>05_indexes.sql</code>, the rewrites in <code>06_optimized_queries.sql</code>, and our measured times.</p>
+  <div class="facts">
+    <div><span class="label">Section C</span><b>Thu 26 Nov</b></div>
+    <div><span class="label">Exam</span><b>2:50 – 3:50 PM</b></div>
+    <div><span class="label">Format</span><b>10 MCQ + 5 scenario</b></div>
+  </div>
+</header>
+
+<nav class="jump" aria-label="Sections">
+  <a href="#concepts">Key ideas</a>
+  <a href="#explain">Reading EXPLAIN</a>
+  <a href="#queries">30 queries</a>
+  <a href="#mcq">MCQ practice</a>
+  <a href="#scenarios">Scenarios</a>
+  <a href="#tips">Exam tips</a>
+</nav>
+
+<section id="concepts">
+  <div class="intro"><h2>Key ideas</h2><p class="muted">If you know these 12, you can answer most questions.</p></div>
+  <div class="concepts">
+    <div class="concept"><h3>Sargable filter</h3><p>An index on a column only helps if the column is left alone in the WHERE. <code>DATE(departure_at) = '2026-07-05'</code> wraps it in a function, so no index. Write a range instead: <code>departure_at &gt;= '2026-07-05 00:00+05:30' AND departure_at &lt; '2026-07-06 00:00+05:30'</code>. Used in R01, R02, R12, R20.</p></div>
+    <div class="concept"><h3>NOT IN vs NOT EXISTS</h3><p>If the subquery returns even one NULL, <code>x NOT IN (…)</code> is never true, so you get 0 rows. R13 gave 0 unused coupons. <code>NOT EXISTS</code> ignores NULLs and gave the correct 10.</p></div>
+    <div class="concept"><h3>Correlated subquery</h3><p>A subquery that uses a column from the outer row runs once per outer row. In R19 it ran 720 times (2,150 ms). One <code>LEFT JOIN … GROUP BY</code> did the same in 20 ms (105× faster).</p></div>
+    <div class="concept"><h3>Composite index</h3><p>Column order matters. Put equality columns first and the range column last: <code>(customer_id, status)</code>, <code>(origin, destination, departure_at)</code>. It works for filters on the leftmost columns, not for the second column alone.</p></div>
+    <div class="concept"><h3>Partial index</h3><p>It indexes only the rows that match a WHERE, so it's tiny when that set is small: <code>WHERE status = 'DELAYED'</code> (R10), <code>'PENDING_PAYMENT'</code> (R11, W02), <code>age &gt;= 60</code> (R21). A query must use the same condition to use it.</p></div>
+    <div class="concept"><h3>Expression index</h3><p>It indexes the result of an expression. <code>ON customers (lower(email))</code> lets R23 (case-insensitive sign-in) use an index: 14.4 ms → 0.07 ms.</p></div>
+    <div class="concept"><h3>Covering index (INCLUDE)</h3><p><code>ON flight_bookings (flight_id) INCLUDE (passengers)</code> stores the extra column in the index, so PostgreSQL can answer from the index alone. The plan shows an <b>Index Only Scan</b>.</p></div>
+    <div class="concept"><h3>Foreign keys aren't indexed automatically</h3><p>PostgreSQL indexes PRIMARY KEY and UNIQUE columns, but not foreign keys. <code>flight_bookings.flight_id</code> and <code>hotel_reviews.hotel_id</code> needed their own indexes (R01, R07, R24).</p></div>
+    <div class="concept"><h3>When an index can't help</h3><p>A query that reads most of a table (R14, R16: every booking), a leading wildcard <code>ILIKE '%breakfast%'</code> (R18: needs a pg_trgm GIN index), or a column-vs-column test <code>departure_at - booked_at &lt; 24h</code> (R25).</p></div>
+    <div class="concept"><h3>OFFSET vs keyset paging</h3><p><code>OFFSET 100000 LIMIT 25</code> still reads 100,025 rows. Keyset paging jumps straight there: <code>WHERE booked_at &lt; :last_seen ORDER BY booked_at DESC LIMIT 25</code> (R22).</p></div>
+    <div class="concept"><h3>Write overhead</h3><p>Each index must be updated on every INSERT/UPDATE. W01 barely changed (1.18 → 1.09 ms), W03 got a little slower (0.39 → 0.50 ms), and W02 got much faster because finding the row became cheap.</p></div>
+    <div class="concept"><h3>Planner statistics</h3><p>The planner picks a plan from its row guesses. On the large data, R03 guessed 14 Goa pool hotels when there were 1,920, so it picked a slow plan. Fix: <code>ANALYZE</code>, and <code>CREATE STATISTICS</code> on the JSON expression.</p></div>
+  </div>
+</section>
+
+<section id="explain">
+  <div class="intro"><h2>Reading EXPLAIN ANALYZE</h2><p class="muted">How we timed every query: 3 runs (5 for CP3), average of the <code>Execution Time</code> line. Write queries ran inside <code>BEGIN … ROLLBACK</code>, so the data never changed.</p></div>
+  <div class="explain">
+    <div class="tablebox"><table>
+      <tr><td>Seq Scan</td><td>Reads the whole table. It's fine for small tables or when most rows are needed, and bad when it throws most rows away (<i>Rows Removed by Filter</i> is big).</td></tr>
+      <tr><td>Index Scan</td><td>Walks the index, then fetches each matching row from the table. Best for a few rows.</td></tr>
+      <tr><td>Index Only Scan</td><td>Everything needed is in the index, so it never visits the table (covering index).</td></tr>
+      <tr><td>Bitmap Heap Scan</td><td>Collects matches from the index first, then reads table pages in order. Used for a medium number of rows.</td></tr>
+      <tr><td>rows=14 vs actual rows=1920</td><td>Estimate vs reality. A big gap means bad statistics, so run <code>ANALYZE</code> or add <code>CREATE STATISTICS</code>.</td></tr>
+      <tr><td>loops=720</td><td>That step ran 720 times, which is the sign of a correlated subquery or nested loop (R19).</td></tr>
+      <tr><td>Sort Method: external merge Disk</td><td>The sort didn't fit in memory (R22 before the fix). An index in ORDER BY order removes the sort.</td></tr>
+      <tr><td>Gather / Workers</td><td>Parallel query. On the large data, R09, R15, R21 and R25 switched to 2 parallel workers.</td></tr>
+    </table></div>
+  </div>
+</section>
+
+<section id="queries">
+  <div class="intro">
+    <h2>The 30 queries</h2>
+    <p class="muted">Tap a row for details. The times are averages in ms: <b>before → after</b> on the seed data (145k bookings), then on the <b>large</b> data (2.9 M bookings).</p>
+  </div>
+  <div class="filters" role="group" aria-label="Filter queries">
+    <button type="button" id="f-all" data-f="all" aria-pressed="true">All 30</button>
+    <button type="button" id="f-rewrite" data-f="rewrite" aria-pressed="false">Rewritten (6)</button>
+    <button type="button" id="f-index" data-f="index" aria-pressed="false">Fixed by index</button>
+    <button type="button" id="f-none" data-f="none" aria-pressed="false">No fix needed / possible</button>
+  </div>
+  <div class="qlist" id="qlist"></div>
+  <p class="muted">Totals on the seed data: 2,875 ms → 507 ms (5.7× faster). On the large data, all 30 meet their targets: real-time under 5 ms, partner under 250 ms, reports under 5 s, W04 under 1 s.</p>
+</section>
+
+<section id="mcq">
+  <div class="intro"><h2>MCQ practice</h2><p class="muted">Pick an answer to see whether it's right and why. <span class="score" id="score">Score: 0 / 0</span></p></div>
+  <div id="mcqs" style="display:grid;gap:12px"></div>
+  <div><button type="button" id="resetQuiz" class="filters-reset" style="font:inherit;font-weight:600;padding:6px 14px;border-radius:6px;border:1px solid var(--line);background:var(--surface);color:var(--fg);cursor:pointer">Reset quiz</button></div>
+</section>
+
+<section id="scenarios">
+  <div class="intro"><h2>Scenario questions</h2><p class="muted">Try to answer each one in your head or on paper first, then open the model answer.</p></div>
+
+  <div class="scen">
+    <h3>1. Reports for June 2026 are slow</h3>
+    <pre>SELECT count(*) FROM bookings
+WHERE EXTRACT(MONTH FROM booked_at) = 6
+  AND EXTRACT(YEAR FROM booked_at) = 2026;</pre>
+    <p>There is an index on <code>booked_at</code>, but the plan shows a Seq Scan. Why, and how do you fix it?</p>
+    <details><summary>Show answer</summary><div class="ans">
+      <p>EXTRACT wraps the column in a function, so the filter is not sargable and the index can't be used. Rewrite it as a range on the bare column:</p>
+      <pre>SELECT count(*) FROM bookings
+WHERE booked_at &gt;= '2026-06-01 00:00+05:30'
+  AND booked_at &lt;  '2026-07-01 00:00+05:30';</pre>
+      <p>Use <code>&gt;=</code> start and <code>&lt;</code> next start, not BETWEEN with 23:59:59. The +05:30 keeps the same IST days as the original. This is what we did for R12 and R20.</p>
+    </div></details>
+  </div>
+
+  <div class="scen">
+    <h3>2. Marketing says the report shows 0 unused coupons, but they know some are unused</h3>
+    <pre>SELECT coupon_code FROM coupons
+WHERE coupon_code NOT IN (SELECT coupon_code FROM bookings);</pre>
+    <details><summary>Show answer</summary><div class="ans">
+      <p>Most bookings have no coupon, so <code>bookings.coupon_code</code> contains NULL. <code>x NOT IN (…, NULL)</code> evaluates to UNKNOWN, never TRUE, so every coupon is filtered out. Fix it with NOT EXISTS (or add <code>WHERE coupon_code IS NOT NULL</code> to the subquery):</p>
+      <pre>SELECT c.coupon_code FROM coupons c
+WHERE NOT EXISTS (SELECT 1 FROM bookings b
+                  WHERE b.coupon_code = c.coupon_code);</pre>
+      <p>This returns the correct 10 rows. The partial index <code>ON bookings (coupon_code) WHERE coupon_code IS NOT NULL</code> makes it an anti-join with an index-only scan (35.8 → 0.16 ms).</p>
+    </div></details>
+  </div>
+
+  <div class="scen">
+    <h3>3. Write a query: top 5 customers by spend in 2026, excluding cancelled bookings. Which index helps?</h3>
+    <details><summary>Show answer</summary><div class="ans">
+      <pre>SELECT customer_id, count(*) AS bookings, sum(total_amount) AS spend
+FROM bookings
+WHERE status &lt;&gt; 'CANCELLED'
+  AND booked_at &gt;= '2026-01-01 00:00+05:30'
+  AND booked_at &lt;  '2027-01-01 00:00+05:30'
+GROUP BY customer_id
+ORDER BY spend DESC
+LIMIT 5;</pre>
+      <p>Index: <code>bookings (booked_at)</code> (our <code>idx_bookings_booked_at</code>) for the date range. But a whole year is a large share of the table (about a third of all bookings), so the gain is small. Like R12 and R17, reading many rows is unavoidable. For a dashboard you'd use a materialized view refreshed nightly.</p>
+    </div></details>
+  </div>
+
+  <div class="scen">
+    <h3>4. Find flights in July 2026 that have no bookings at all</h3>
+    <details><summary>Show answer</summary><div class="ans">
+      <pre>SELECT f.flight_id, f.flight_no, f.departure_at
+FROM flights f
+WHERE f.departure_at &gt;= '2026-07-01 00:00+05:30'
+  AND f.departure_at &lt;  '2026-08-01 00:00+05:30'
+  AND NOT EXISTS (SELECT 1 FROM flight_bookings fb
+                  WHERE fb.flight_id = f.flight_id);</pre>
+      <p>Same idea as a <code>LEFT JOIN … WHERE fb.flight_id IS NULL</code>. Avoid NOT IN. Indexes: <code>idx_flights_departure</code> for the date range and <code>idx_fb_flight</code> on the foreign key for each lookup. R08 is the version with fewer than 5 passengers: it uses <code>LEFT JOIN</code> + <code>HAVING coalesce(sum(fb.passengers),0) &lt; 5</code>, so flights with zero bookings still appear.</p>
+    </div></details>
+  </div>
+
+  <div class="scen">
+    <h3>5. The support console is slow on page 4,001 and gets slower the further you go</h3>
+    <pre>SELECT * FROM bookings ORDER BY booked_at DESC OFFSET 100000 LIMIT 25;</pre>
+    <details><summary>Show answer</summary><div class="ans">
+      <p>OFFSET still reads and throws away every skipped row. Before our fix it sorted all bookings on disk (8 MB external merge, 82 ms). The <code>booked_at</code> index removed the sort (Index Scan Backward, 20 ms), but it still reads 100,025 rows. The real fix is keyset pagination: the app remembers the last <code>booked_at</code> it showed.</p>
+      <pre>SELECT * FROM bookings
+WHERE booked_at &lt; :last_seen_booked_at
+ORDER BY booked_at DESC
+LIMIT 25;</pre>
+      <p>That reads only 25 rows on any page. If two bookings can share a timestamp, add <code>booking_id</code> as a tie-breaker: <code>WHERE (booked_at, booking_id) &lt; (:t, :id) ORDER BY booked_at DESC, booking_id DESC</code>.</p>
+    </div></details>
+  </div>
+
+  <div class="scen">
+    <h3>6. After the data grew 20×, a query that took 0.8 ms now takes 8 ms. How do you find out why?</h3>
+    <details><summary>Show answer</summary><div class="ans">
+      <p>1) Run <code>EXPLAIN (ANALYZE, BUFFERS)</code>. 2) Compare estimated rows with actual rows at each step. 3) Look for Rows Removed by Filter, sorts and loops.</p>
+      <p>This was R03 for us: the planner guessed 14 hotels with a pool but found 1,920, so it fetched all 2,740 Goa 4★+ hotels and sorted them. Fix: an index in the ORDER BY order, <code>(city_name, user_rating DESC NULLS LAST)</code>, plus <code>CREATE STATISTICS … ON ((amenities -&gt;&gt; 'pool'))</code> so the guess is right. It now reads 83 rows and stops: 8.1 → 0.33 ms.</p>
+    </div></details>
+  </div>
+
+  <div class="scen">
+    <h3>7. Show bookings per day in June 2026 with a running total</h3>
+    <details><summary>Show answer</summary><div class="ans">
+      <pre>SELECT day, bookings,
+       sum(bookings) OVER (ORDER BY day) AS running_total
+FROM (
+  SELECT (booked_at AT TIME ZONE 'Asia/Kolkata')::date AS day, count(*) AS bookings
+  FROM bookings
+  WHERE booked_at &gt;= '2026-06-01 00:00+05:30'
+    AND booked_at &lt;  '2026-07-01 00:00+05:30'
+  GROUP BY 1
+) d
+ORDER BY day;</pre>
+      <p>A window function with <code>OVER (ORDER BY day)</code> adds up all rows up to the current one without collapsing them. Filter with a range, not <code>booked_at::date BETWEEN</code>, so the index works. That gave an index-only scan in R20 (13.2 → 2.9 ms).</p>
+    </div></details>
+  </div>
+
+  <div class="scen">
+    <h3>8. Should we partition the bookings table?</h3>
+    <details><summary>Show answer</summary><div class="ans">
+      <p>We tested RANGE partitioning by <code>booked_at</code> per quarter on 2.9 M bookings (<code>08_partitioning.sql</code>). Pruning worked: the June query read only <code>bookings_2026_q2</code>. But it was not faster (22.0 vs 21.4 ms), because the <code>booked_at</code> index already finds the rows.</p>
+      <p>Partitioning helps with archiving (drop a whole quarter instantly instead of a slow DELETE), smaller per-partition indexes, and per-partition VACUUM. The cost: the primary key must include the partition key, <code>(booking_id, booked_at)</code>. Decision: not yet, only at about 50–100 M rows or when old data must be archived.</p>
+    </div></details>
+  </div>
+</section>
+
+<section id="tips">
+  <div class="intro"><h2>Exam tips</h2></div>
+  <ul class="tips">
+    <li>For "why is this slow", check: a function on the column? A leading <code>%</code>? A missing foreign-key index? A correlated subquery? A big OFFSET? NOT IN with NULLs?</li>
+    <li>For "which index", put equality columns first and the range column last. Use a partial index for a rare status, an expression index for <code>lower()</code>, and INCLUDE to make it covering.</li>
+    <li>Say when an index won't help: when a query reads most of the table, the answer is "no index helps; use a summary or materialized view".</li>
+    <li>Always state the trade-off: more indexes mean faster reads, slower writes and more disk (our indexes are 748 MB on the large data, almost the table size of 776 MB).</li>
+    <li>Use your own numbers. They show you did the work: R19 2,150 → 20 ms, R13 0 → 10 rows, R03 8.1 → 0.33 ms at 20× data, and 5.7× faster in total.</li>
+  </ul>
+</section>
+</div>
+<script>
+const ROWS = [{"id": "R01", "t": "Flight search DEL→BOM on 5 Jul", "g": "Real-time", "feat": "LEFT JOIN + SUM(...) FILTER, GROUP BY", "prob": "DATE(departure_at) = ... wraps the column in a function, so no index can be used; flight_bookings.flight_id (a foreign key) had no index", "fix": "Rewrote as an IST time range; idx_flights_route_departure / idx_flights_departure + idx_fb_flight", "tag": "rewrite", "b": "14.7", "o": "0.197", "l": "1.28"}, {"id": "R02", "t": "Cheapest fare per day, BLR→DEL July", "g": "Real-time", "feat": "GROUP BY day, MIN()", "prob": "departure_at::date BETWEEN ... is not sargable", "fix": "IST range on departure_at + index on departure_at", "tag": "rewrite", "b": "1.202", "o": "0.222", "l": "0.258"}, {"id": "R03", "t": "4★+ Goa hotels with pool", "g": "Real-time", "feat": "JSONB ->>, ORDER BY ... NULLS LAST, LIMIT", "prob": "Seq scan; on the large data the planner guessed 14 pool hotels instead of 1,920", "fix": "idx_hotels_city_stars, then idx_hotels_city_rating + CREATE STATISTICS on (amenities->>'pool')", "tag": "index", "b": "0.348", "o": "0.213", "l": "0.328"}, {"id": "R04", "t": "Rooms left, hotel 208, 10–12 Jul", "g": "Real-time", "feat": "Date-overlap test (check_in < end AND check_out > start)", "prob": "Seq scan on hotel_bookings", "fix": "Composite idx_hb_room_type_checkin (room_type_id, check_in) INCLUDE (check_out, rooms)", "tag": "index", "b": "4.392", "o": "0.501", "l": "0.555"}, {"id": "R05", "t": "My Trips for customer 1021", "g": "Real-time", "feat": "LEFT JOIN both subtypes, COALESCE travel date", "prob": "Seq scan on bookings to find one customer", "fix": "Composite idx_bookings_customer_status (customer_id, status)", "tag": "index", "b": "11.3", "o": "0.16", "l": "0.11"}, {"id": "R06", "t": "Open booking by reference", "g": "Real-time", "feat": "Equality on a UNIQUE column", "prob": "Already fast: UNIQUE constraint creates an index", "fix": "Nothing needed", "tag": "none", "b": "16.3", "o": "0.067", "l": "0.097"}, {"id": "R07", "t": "Passenger manifest of one flight", "g": "Real-time", "feat": "3-table JOIN, ORDER BY seat NULLS LAST", "prob": "No index on the foreign key flight_bookings.flight_id", "fix": "idx_fb_flight (flight_id) INCLUDE (passengers)", "tag": "index", "b": "5.857", "o": "0.197", "l": "3.432"}, {"id": "R08", "t": "July flights with < 5 passengers", "g": "Partner", "feat": "LEFT JOIN + HAVING coalesce(sum) < 5", "prob": "Seq scans on flights and flight_bookings", "fix": "idx_flights_departure + idx_fb_flight (index-only scan)", "tag": "index", "b": "15.7", "o": "2.107", "l": "23.2"}, {"id": "R09", "t": "Top 10 routes in June", "g": "Report", "feat": "3-table JOIN, GROUP BY, ORDER BY count DESC LIMIT 10", "prob": "Reads a whole month of bookings", "fix": "idx_bookings_booked_at; little gain, still reads most flight_bookings", "tag": "index", "b": "28.3", "o": "26.5", "l": "218.3"}, {"id": "R10", "t": "Delayed flights", "g": "Real-time", "feat": "Simple filter on status", "prob": "Seq scan to find a few DELAYED rows", "fix": "Partial index WHERE status = 'DELAYED'", "tag": "index", "b": "1.189", "o": "0.034", "l": "0.053"}, {"id": "R11", "t": "Pending payment > 30 min", "g": "Real-time", "feat": "TIMESTAMPTZ − interval", "prob": "Seq scan for a few pending rows", "fix": "Partial index WHERE status = 'PENDING_PAYMENT'", "tag": "index", "b": "10.4", "o": "0.045", "l": "0.375"}, {"id": "R12", "t": "Revenue per type per month, 2026", "g": "Report", "feat": "date_trunc, GROUP BY, EXTRACT", "prob": "EXTRACT(YEAR FROM booked_at) = 2026 is not sargable", "fix": "Rewrote as a range; little gain because it reads a whole year", "tag": "rewrite", "b": "33.3", "o": "30.0", "l": "813.9"}, {"id": "R13", "t": "Coupons never used", "g": "Partner", "feat": "NOT IN (subquery)", "prob": "WRONG RESULT: bookings.coupon_code has NULLs, so NOT IN returns 0 rows", "fix": "Rewrote as NOT EXISTS → correct 10 rows; partial idx_bookings_coupon", "tag": "rewrite", "b": "35.8", "o": "0.158", "l": "0.226"}, {"id": "R14", "t": "Cancellation % per airline", "g": "Report", "feat": "4-table JOIN, COUNT(*) FILTER", "prob": "Needs every booking: no index can help", "fix": "None possible; materialized view if it grows", "tag": "none", "b": "75.7", "o": "80.6", "l": "1,073.8"}, {"id": "R15", "t": "Room-nights per city, June", "g": "Report", "feat": "LEAST/GREATEST date maths, overlap", "prob": "Large share of hotel_bookings", "fix": "idx_hb_checkout; little gain", "tag": "index", "b": "32.9", "o": "33.1", "l": "361.3"}, {"id": "R16", "t": "Avg lead days per type & tier", "g": "Report", "feat": "AVG of date difference, LEFT JOINs", "prob": "Aggregates whole tables", "fix": "None possible; slowest on large (2.6 s)", "tag": "none", "b": "157.7", "o": "149.4", "l": "2,630.8"}, {"id": "R17", "t": "Customers with ≥ 3 trips in 2026", "g": "Report", "feat": "GROUP BY + HAVING count ≥ 3", "prob": "Reads a whole year", "fix": "idx_bookings_booked_at; little gain", "tag": "index", "b": "39.7", "o": "38.4", "l": "1,092.1"}, {"id": "R18", "t": "Goa reviews mentioning breakfast", "g": "Partner", "feat": "ILIKE '%breakfast%'", "prob": "Leading % wildcard: a B-tree cannot help", "fix": "idx_hotels_city_stars narrows to Goa; a pg_trgm GIN index would be the real fix", "tag": "index", "b": "8.79", "o": "8.633", "l": "67.1"}, {"id": "R19", "t": "Passengers on every June flight", "g": "Report", "feat": "Correlated subquery in SELECT", "prob": "Subquery ran once per flight (720 loops, 463,790 buffer reads)", "fix": "Rewrote as one LEFT JOIN + GROUP BY → 105× faster", "tag": "rewrite", "b": "2,150.4", "o": "20.4", "l": "425.1"}, {"id": "R20", "t": "Bookings per day + running total", "g": "Report", "feat": "Window function SUM() OVER (ORDER BY day)", "prob": "booked_at::date BETWEEN is not sargable", "fix": "IST range → index-only scan on idx_bookings_booked_at", "tag": "rewrite", "b": "13.2", "o": "2.926", "l": "59.1"}, {"id": "R21", "t": "Senior (60+) passengers per route", "g": "Report", "feat": "JOIN + GROUP BY", "prob": "Seq scan on passengers", "fix": "Partial index idx_pax_senior WHERE age >= 60", "tag": "index", "b": "42.3", "o": "34.1", "l": "397.6"}, {"id": "R22", "t": "Bookings page 4,001 (OFFSET 100000)", "g": "Partner", "feat": "ORDER BY ... DESC OFFSET LIMIT", "prob": "Sorted all 145k rows on disk (8 MB external merge)", "fix": "idx_bookings_booked_at read backwards, no sort; keyset paging is the full fix", "tag": "index", "b": "82.2", "o": "20.3", "l": "28.5"}, {"id": "R23", "t": "Sign-in by email, ignore case", "g": "Real-time", "feat": "lower(email) = ...", "prob": "Function on the column: the plain UNIQUE(email) index is not used", "fix": "Expression index ON customers (lower(email))", "tag": "index", "b": "14.4", "o": "0.073", "l": "0.096"}, {"id": "R24", "t": "Goa hotels with ≥ 5 reviews", "g": "Partner", "feat": "GROUP BY + HAVING + AVG", "prob": "Seq scans on reviews and hotels; FK hotel_reviews.hotel_id not indexed", "fix": "idx_hotels_city_stars + idx_reviews_hotel", "tag": "index", "b": "4.343", "o": "3.82", "l": "115.6"}, {"id": "R25", "t": "Last-minute bookings (< 24 h)", "g": "Report", "feat": "Column-minus-column comparison", "prob": "departure_at − booked_at < 24 h compares two columns: not indexable", "fix": "Only the booked_at ≥ 2026 part uses the index", "tag": "index", "b": "60.4", "o": "48.1", "l": "478.0"}, {"id": "W01", "t": "Create pending booking", "g": "Real-time", "feat": "INSERT", "prob": "Every extra index must be updated too", "fix": "Nothing; cost stays ~1 ms", "tag": "none", "b": "1.179", "o": "1.088", "l": "1.31"}, {"id": "W02", "t": "Confirm oldest pending booking", "g": "Real-time", "feat": "UPDATE with MIN() subquery", "prob": "Walked the primary key, discarding 144,695 rows", "fix": "Partial index idx_bookings_pending_id → 50× faster", "tag": "index", "b": "22.1", "o": "0.444", "l": "0.588"}, {"id": "W03", "t": "Cancel MMA7772F, 70% refund", "g": "Real-time", "feat": "UPDATE by UNIQUE key, guard status <> 'CANCELLED'", "prob": "Already uses booking_ref index", "fix": "Nothing needed", "tag": "none", "b": "0.386", "o": "0.502", "l": "0.687"}, {"id": "W04", "t": "Mark old flights departed", "g": "Batch", "feat": "Bulk UPDATE with IN (...)", "prob": "Updates many rows: seq scan is the right plan", "fix": "Nothing needed", "tag": "none", "b": "2.37", "o": "1.846", "l": "2.389"}, {"id": "W05", "t": "Assign room numbers, 1 Jul check-ins", "g": "Partner", "feat": "UPDATE ... FROM (join in an update)", "prob": "Seq scan on hotel_bookings", "fix": "idx_hb_checkin (check_in)", "tag": "index", "b": "4.786", "o": "2.601", "l": "61.8"}];
+const TAGNAME = { rewrite: 'Rewritten', index: 'Index', none: 'No fix' };
+
+function esc(s) { return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
+
+function renderQueries(filter) {
+  const list = document.getElementById('qlist');
+  list.innerHTML = '';
+  ROWS.filter(r => filter === 'all' || r.tag === filter).forEach(r => {
+    const d = document.createElement('details');
+    d.className = 'q';
+    d.innerHTML =
+      '<summary><span class="id">' + r.id + '</span>' +
+      '<span class="ttl">' + esc(r.t) + '<span class="chip ' + r.tag + '">' + TAGNAME[r.tag] + '</span><small>' + r.g + ' · ' + esc(r.feat) + '</small></span>' +
+      '<span class="times">' + r.b + ' → <span class="after">' + r.o + '</span><br><span class="muted">large ' + r.l + '</span></span></summary>' +
+      '<div class="body">' +
+      '<div class="row"><span class="label">Problem</span><span>' + esc(r.prob) + '</span></div>' +
+      '<div class="row"><span class="label">Fix</span><span>' + esc(r.fix) + '</span></div>' +
+      '</div>';
+    list.append(d);
+  });
+}
+
+document.querySelectorAll('.filters button[data-f]').forEach(b => {
+  b.onclick = () => {
+    document.querySelectorAll('.filters button[data-f]').forEach(x => x.setAttribute('aria-pressed', 'false'));
+    b.setAttribute('aria-pressed', 'true');
+    renderQueries(b.dataset.f);
+  };
+});
+document.getElementById('f-index').textContent = 'Fixed by index (' + ROWS.filter(r => r.tag === 'index').length + ')';
+document.getElementById('f-none').textContent = 'No fix needed / possible (' + ROWS.filter(r => r.tag === 'none').length + ')';
+document.getElementById('f-rewrite').textContent = 'Rewritten (' + ROWS.filter(r => r.tag === 'rewrite').length + ')';
+renderQueries('all');
+
+const MCQ = [
+  { q: 'Why can\'t <code>WHERE DATE(departure_at) = \'2026-07-05\'</code> use an index on <code>departure_at</code>?',
+    o: ['The index is on the wrong table', 'A function is applied to the column, so the filter is not sargable', 'DATE() is not allowed in PostgreSQL', 'Indexes never work on timestamp columns'],
+    a: 1, w: 'The index stores raw departure_at values, not DATE(departure_at). Rewrite as a range on the bare column (R01, R02, R12, R20).' },
+  { q: 'R13 used <code>coupon_code NOT IN (SELECT coupon_code FROM bookings)</code> and returned 0 rows. Why?',
+    o: ['There really are no unused coupons', 'NOT IN is slower than NOT EXISTS', 'The subquery contains NULLs, so NOT IN is never true', 'The coupons table is empty'],
+    a: 2, w: 'x NOT IN (…, NULL) evaluates to UNKNOWN. NOT EXISTS returns the correct 10 coupons.' },
+  { q: 'Which index makes <code>WHERE lower(email) = \'a@b.com\'</code> fast?',
+    o: ['CREATE INDEX ON customers (email)', 'CREATE INDEX ON customers (lower(email))', 'CREATE UNIQUE INDEX ON customers (customer_id)', 'No index can help a function'],
+    a: 1, w: 'An expression index stores lower(email), exactly what the query compares. R23: 14.4 → 0.07 ms.' },
+  { q: 'Only about 0.1% of bookings are PENDING_PAYMENT. Best index for "oldest pending booking"?',
+    o: ['ON bookings (status)', 'ON bookings (booking_id) WHERE status = \'PENDING_PAYMENT\'', 'ON bookings (booking_id, status, booked_at)', 'A hash index on status'],
+    a: 1, w: 'A partial index holds only the pending rows, so it\'s tiny, and the minimum is its first entry. W02: 22.1 → 0.44 ms.' },
+  { q: 'In R19\'s old plan, a Seq Scan on flight_bookings shows <code>loops=720</code>. What does this point to?',
+    o: ['A missing primary key', 'A correlated subquery running once per outer row', 'Parallel workers', 'A disk sort'],
+    a: 1, w: 'The subquery ran once for each of the 720 June flights. One JOIN + GROUP BY: 2,150 → 20 ms.' },
+  { q: 'Index <code>(customer_id, status)</code> exists. Which filter can it use efficiently?',
+    o: ['WHERE status = \'CONFIRMED\'', 'WHERE customer_id = 1021', 'WHERE total_amount > 5000', 'WHERE status = \'CONFIRMED\' OR customer_id = 1021'],
+    a: 1, w: 'A composite B-tree works from its leftmost column. status alone is the second column, so the index can\'t jump to it.' },
+  { q: 'R18 filters <code>review_text ILIKE \'%breakfast%\'</code>. Why doesn\'t a B-tree index on review_text help?',
+    o: ['ILIKE is case-sensitive', 'A leading % means there is no fixed prefix to search the sorted index by', 'review_text is too long for any index', 'Because of the LIMIT'],
+    a: 1, w: 'A B-tree is sorted from the first character. For "contains" searches use a pg_trgm GIN index.' },
+  { q: 'What does an <b>Index Only Scan</b> mean?',
+    o: ['The table has only one index', 'All needed columns come from the index without visiting the table', 'The index was scanned but nothing matched', 'The planner ignored the table statistics'],
+    a: 1, w: 'For example, idx_fb_flight (flight_id) INCLUDE (passengers) is a covering index, so R08 sums passengers from the index alone.' },
+  { q: 'We added 16 indexes. What is the main cost?',
+    o: ['SELECT queries become slower', 'INSERT/UPDATE must also update the indexes, and they use disk space', 'Data becomes inconsistent', 'Foreign keys stop working'],
+    a: 1, w: 'This is the write overhead. On the large data the indexes are 748 MB vs 776 MB of tables. W01 still took about 1 ms.' },
+  { q: 'A plan shows <code>rows=14</code> estimated but <code>actual rows=1920</code>. What should you do first?',
+    o: ['Add more RAM', 'Run ANALYZE / create statistics so the planner\'s estimates are right', 'Drop all indexes', 'Increase LIMIT'],
+    a: 1, w: 'That was R03 on the large data. CREATE STATISTICS on (amenities ->> \'pool\') plus an index in rating order: 8.1 → 0.33 ms.' },
+  { q: 'Why does R22 (<code>OFFSET 100000 LIMIT 25</code>) stay at about 20–28 ms even with an index?',
+    o: ['The index is broken', 'OFFSET still reads and skips 100,000 rows', 'LIMIT 25 is too big', 'ORDER BY DESC can\'t use an index'],
+    a: 1, w: 'The index removed the 8 MB disk sort, but the skipped rows are still read. Keyset paging (WHERE booked_at < :last_seen) is the fix.' },
+  { q: 'In our partitioned bookings table, why is the primary key <code>(booking_id, booked_at)</code>?',
+    o: ['To make inserts faster', 'A unique constraint on a partitioned table must include the partition key', 'booking_id is not unique', 'Because of the foreign keys to customers'],
+    a: 1, w: 'PostgreSQL can only enforce uniqueness inside each partition. That\'s one cost of partitioning.' },
+  { q: 'Why did we run the write queries inside <code>BEGIN … ROLLBACK</code> when timing them?',
+    o: ['To make them faster', 'So the data is unchanged and every run (and other queries) see the same data', 'ROLLBACK is required for EXPLAIN', 'To avoid locks on other databases'],
+    a: 1, w: 'EXPLAIN ANALYZE really runs the statement, so ROLLBACK undoes it after timing.' },
+  { q: 'R14 (cancellation % per airline) barely improved with indexes. Why?',
+    o: ['Its indexes were missing', 'It needs every flight booking, so a sequential scan is already the best plan', 'It uses NOT IN', 'It uses a window function'],
+    a: 1, w: 'When a query reads the whole table, no index helps. A materialized view refreshed nightly would be the fix at bigger scale.' },
+];
+
+let answered = 0, correct = 0;
+function renderMCQ() {
+  answered = 0; correct = 0;
+  document.getElementById('score').textContent = 'Score: 0 / 0';
+  const box = document.getElementById('mcqs');
+  box.innerHTML = '';
+  MCQ.forEach((m, i) => {
+    const card = document.createElement('div');
+    card.className = 'mcq';
+    card.innerHTML = '<span class="n">Q' + (i + 1) + ' of ' + MCQ.length + '</span><div>' + m.q + '</div><div class="opts"></div>';
+    const opts = card.querySelector('.opts');
+    m.o.forEach((text, j) => {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.id = 'q' + i + 'o' + j;
+      btn.textContent = String.fromCharCode(65 + j) + '.  ' + text.replace(/<[^>]+>/g, '');
+      btn.onclick = () => {
+        opts.querySelectorAll('button').forEach(b => b.disabled = true);
+        opts.children[m.a].classList.add('right');
+        if (j !== m.a) btn.classList.add('wrong'); else correct++;
+        answered++;
+        document.getElementById('score').textContent = 'Score: ' + correct + ' / ' + answered;
+        const why = document.createElement('div');
+        why.className = 'why';
+        why.innerHTML = (j === m.a ? '<b>Correct.</b> ' : '<b>Answer: ' + String.fromCharCode(65 + m.a) + '.</b> ') + m.w;
+        card.append(why);
+      };
+      opts.append(btn);
+    });
+    box.append(card);
+  });
+}
+document.getElementById('resetQuiz').onclick = renderMCQ;
+renderMCQ();
+</script>
+</body>
+</html>
